@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feedback</title>
+</head>
+<body>
+    <h1>Feedback</h1>
+    <form id="filter-sort-form">
+        <label for="start_date">Start Date:</label>
+        <input type="date" id="start_date" name="start_date"><br><br>
+
+        <label for="end_date">End Date:</label>
+        <input type="date" id="end_date" name="end_date"><br><br>
+
+        <label for="sort_by">Sort By:</label>
+        <select id="sort_by" name="sort_by">
+            <option value="created_at">Date</option>
+            <option value="rating">Rating</option>
+        </select><br><br>
+
+        <label for="sort_order">Sort Order:</label>
+        <select id="sort_order" name="sort_order">
+            <option value="asc">Ascending</option>
+            <option value="desc">Descending</option>
+        </select><br><br>
+
+        <button type="submit">Apply</button>
+    </form>
+
+    <ul id="feedback-list"></ul>
+
+    <script>
+        document.getElementById('filter-sort-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const startDate = document.getElementById('start_date').value;
+            const endDate = document.getElementById('end_date').value;
+            const sortBy = document.getElementById('sort_by').value;
+            const sortOrder = document.getElementById('sort_order').value;
+
+            const params = new URLSearchParams({
+                sort_by: sortBy,
+                sort_order: sortOrder,
+                start_date: startDate,
+                end_date: endDate
+            });
+
+            fetch(`/api/feedback?${params.toString()}`)
+                .then(response => response.json())
+                .then(data => {
+                    renderFeedbackList(data);
+                })
+                .catch(error => console.error('Error fetching feedback:', error));
+        });
+
+        function renderFeedbackList(feedbacks) {
+            const feedbackList = document.getElementById('feedback-list');
+            feedbackList.innerHTML = '';
+            feedbacks.forEach(feedback => {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <p><strong>Name:</strong> ${feedback.user_name}</p>
+                    <p><strong>Email:</strong> ${feedback.user_email}</p>
+                    <p><strong>Feedback:</strong> ${feedback.feedback_comment}</p>
+                    <p><strong>Rating:</strong> ${feedback.rating}</p>
+                    <p><strong>Date:</strong> ${new Date(feedback.created_at).toLocaleDateString()}</p>
+                    <hr>
+                `;
+                feedbackList.appendChild(li);
+            });
+        }
+    </script>
+</body>
+</html>

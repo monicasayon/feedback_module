@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submit Feedback</title>
+</head>
+<body>
+    <h1>Submit Feedback</h1>
+    <form id="feedback-form">
+        <label for="user_name">Name:</label>
+        <input type="text" id="user_name" name="user_name" required><br><br>
+
+        <label for="user_email">Email:</label>
+        <input type="email" id="user_email" name="user_email" required><br><br>
+
+        <label for="feedback_comment">Feedback:</label><br>
+        <textarea id="feedback_comment" name="feedback_comment" rows="4" cols="50" required></textarea><br><br>
+
+        <label for="rating">Rating:</label>
+        <input type="number" id="rating" name="rating" min="1" max="5" required><br><br>
+
+        <!-- Hidden input field -->
+        <input type="hidden" id="user_id" name="user_id" value="3"> <!-- Replace with user ID -->
+
+        <button type="submit">Submit Feedback</button>
+    </form>
+
+    <script>
+        document.getElementById('feedback-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const formData = {
+                user_name: document.getElementById('user_name').value,
+                user_email: document.getElementById('user_email').value,
+                feedback_comment: document.getElementById('feedback_comment').value,
+                rating: document.getElementById('rating').value,
+                user_id: document.getElementById('user_id').value
+            };
+
+            const authToken = 'YOUR_ACCESS_TOKEN_HERE'; // Replace with your actual access token
+
+            fetch('/api/feedback', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${authToken}`, // Include authorization header
+                },
+                body: JSON.stringify(formData),
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                return response.json();
+            })
+            .then(data => {
+                alert('Feedback submitted successfully!');
+                // Optionally, you can clear the form fields after successful submission
+                document.getElementById('feedback-form').reset();
+            })
+            .catch(error => console.error('Error submitting feedback:', error));
+        });
+    </script>
+</body>
+</html>
